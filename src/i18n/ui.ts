@@ -14,6 +14,8 @@ export const ui = {
       "WebtrES Village en Ekoparty Buenos Aires {year}. Comunidad global e hispanohablante de desarrollo y seguridad Web3. Próximamente.",
     "meta.ogDescription":
       "La aldea de la comunidad de blockchain hackers llega a Ekoparty {year}. Próximamente.",
+    "meta.ogImageAlt":
+      "Terminal retro con el UwUloscopio: WebtrES Village — COMING SOON — Ekoparty · Buenos Aires · {year}",
 
     "terminal.aria": "WebtrES Village — próximamente",
     "lang.aria": "Seleccionar idioma",
@@ -38,6 +40,8 @@ export const ui = {
       "WebtrES Village at Ekoparty Buenos Aires {year}. Global Spanish-speaking community for Web3 development and security. Coming soon.",
     "meta.ogDescription":
       "The blockchain hackers community village lands at Ekoparty {year}. Coming soon.",
+    "meta.ogImageAlt":
+      "Retro terminal with the UwUloscopio mascot: WebtrES Village — COMING SOON — Ekoparty · Buenos Aires · {year}",
 
     "terminal.aria": "WebtrES Village — coming soon",
     "lang.aria": "Select language",

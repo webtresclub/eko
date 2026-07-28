@@ -1,7 +1,7 @@
 # Social OG card + metadata — design
 
 **Date:** 2026-07-28
-**Status:** approved, not yet implemented
+**Status:** implemented
 
 ## Problem
 
