@@ -2,7 +2,7 @@
 // WebtrES Village — Coming Soon
 // Ekoparty · Buenos Aires · 2026
 import { getRelativeLocaleUrl } from "astro:i18n";
-import { cfp, event, socials } from "../data/village";
+import { attribution, cfp, event, socials } from "../data/village";
 import { languages, type Lang } from "../i18n/ui";
 import { formatDate, useTranslations } from "../i18n/utils";
 
@@ -199,7 +199,14 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
       </section>
 
       <footer class="foot">
-        <span>WebtrES Club</span>
+        <span>
+          {attribution.webtres} x <a
+            class="foot-link"
+            href={attribution.trg.href}
+            target="_blank"
+            rel="noopener noreferrer">{attribution.trg.label}</a
+          >
+        </span>
         <span class="foot-sep" aria-hidden="true">·</span>
         <span>{t("footer.tagline")}</span>
       </footer>
@@ -602,6 +609,17 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
   }
   .foot-sep {
     opacity: 0.6;
+  }
+  /* .foot is already dimmed with opacity, so a child can only get darker —
+     hover shifts colour instead of brightness. */
+  .foot-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+  }
+  .foot-link:hover,
+  .foot-link:focus-visible {
+    color: var(--accent);
   }
 
   .br-md {

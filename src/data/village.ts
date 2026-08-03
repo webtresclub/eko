@@ -12,6 +12,12 @@ export const cfp = {
   deadline: "2026-09-01",
 };
 
+/** Footer credit. Proper nouns, so the same in every locale. */
+export const attribution = {
+  webtres: "WebtrES Club",
+  trg: { label: "The Red Guild 🪷", href: "https://theredguild.org" },
+};
+
 export const socials = [
   { label: "discord", href: "https://discord.gg/eegRCDmwbM" },
   { label: "telegram", href: "https://t.me/webtresclub" },
