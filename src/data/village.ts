@@ -6,12 +6,6 @@ export const event = {
   year: "2026",
 };
 
-export const cfp = {
-  href: "https://eth-security-explorations.notion.site/c3d21cf92b6849f895e617a05e201fd0?pvs=105",
-  /** ISO date — rendered per locale by formatDate(). */
-  deadline: "2026-09-01",
-};
-
 /** Footer credit. Proper nouns, so the same in every locale. */
 export const attribution = {
   webtres: "WebtrES Club",

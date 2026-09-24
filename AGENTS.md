@@ -15,15 +15,17 @@ declared in `astro.config.mjs` with `prefixDefaultLocale: false`.
 
 - `src/i18n/ui.ts` — every translatable string, keyed per locale. `{placeholders}` are
   filled by `t(key, params)`.
-- `src/i18n/utils.ts` — `useTranslations(lang)` and `formatDate(isoDate, lang)`.
-- `src/data/village.ts` — locale-independent facts (URLs, dates, event details).
+- `src/i18n/utils.ts` — `useTranslations(lang)`, `formatDay`, `formatDateSpan`.
+- `src/data/village.ts` — locale-independent facts (event identity, socials).
+- `src/data/schedule.ts` — confirmed slots (day, room, time, speaker). Día 1–3 are 7–9 October 2026 at the CEC, `America/Argentina/Buenos_Aires`. Titles and descriptions are `talk.<id>.title` / `talk.<id>.description` in `ui.ts`.
+- `src/pages/calendar/[lang]/[slug].ics.ts` — prerendered per-talk `.ics`. Not committed; `astro build` emits them.
 - `src/layouts/VillageLayout.astro` — the page; takes a `lang` prop.
 - `src/pages/index.astro` (es) and `src/pages/en/index.astro` (en) are thin wrappers.
 
 To add a string, add the key to **both** locale objects in `ui.ts` — the `satisfies`
 constraint and `UIKey` type will flag a locale that's missing one. To add a locale, add
-it to `locales` in `astro.config.mjs`, to `languages`/`ui` in `ui.ts`, to `dateFormats`
-in `utils.ts`, and create `src/pages/<code>/index.astro`.
+it to `locales` in `astro.config.mjs`, to `languages`/`ui` in `ui.ts`, to the locale
+branches in `formatDay` / `formatDateSpan`, and create `src/pages/<code>/index.astro`.
 
 ## Social card
 

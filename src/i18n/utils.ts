@@ -1,3 +1,4 @@
+import type { TalkId } from "../data/schedule";
 import { defaultLang, ui, type Lang, type UIKey } from "./ui";
 
 type Params = Record<string, string | number>;
@@ -15,15 +16,36 @@ export function useTranslations(lang: Lang) {
   };
 }
 
-const dateFormats: Record<Lang, Intl.DateTimeFormatOptions> = {
-  es: { day: "2-digit", month: "2-digit", year: "2-digit", timeZone: "UTC" },
-  en: { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" },
-};
-
-/** Formats an ISO date (`YYYY-MM-DD`) the way each locale expects to read it. */
-export function formatDate(isoDate: string, lang: Lang): string {
+/** Weekday + day + short month for an ISO date, read in UTC so the calendar day doesn't shift. */
+export function formatDay(isoDate: string, lang: Lang): string {
   const locale = lang === "es" ? "es-AR" : "en-US";
-  return new Intl.DateTimeFormat(locale, dateFormats[lang]).format(
-    new Date(`${isoDate}T00:00:00Z`),
-  );
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(`${isoDate}T00:00:00Z`));
+}
+
+/** Compact span. Same month collapses to "7–9 oct" / "Oct 7–9". */
+export function formatDateSpan(startIso: string, endIso: string, lang: Lang): string {
+  const locale = lang === "es" ? "es-AR" : "en-US";
+  const start = new Date(`${startIso}T00:00:00Z`);
+  const end = new Date(`${endIso}T00:00:00Z`);
+  const day = new Intl.DateTimeFormat(locale, { day: "numeric", timeZone: "UTC" });
+  const month = new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" });
+  const sameMonth = start.getUTCMonth() === end.getUTCMonth();
+  if (lang === "es") {
+    return sameMonth
+      ? `${day.format(start)}–${day.format(end)} ${month.format(end)}`
+      : `${day.format(start)} ${month.format(start)}–${day.format(end)} ${month.format(end)}`;
+  }
+  return sameMonth
+    ? `${month.format(start)} ${day.format(start)}–${day.format(end)}`
+    : `${month.format(start)} ${day.format(start)}–${month.format(end)} ${day.format(end)}`;
+}
+
+/** `talk.<id>.title|description` — fails typecheck if a slot has no copy. */
+export function talkKey(id: TalkId, field: "title" | "description"): UIKey {
+  return `talk.${id}.${field}`;
 }

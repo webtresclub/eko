@@ -1,8 +1,8 @@
 # eko — WebtrES Village
 
 Landing page for the **WebtrES Village** at Ekoparty, Buenos Aires 2026 — the
-blockchain hackers community village. A static, bilingual "coming soon" page
-built with [Astro](https://astro.build), styled as a retro terminal.
+blockchain hackers community village. A static, bilingual page with the confirmed
+talk schedule. Built with [Astro](https://astro.build), styled as a retro terminal.
 
 ## Stack
 
@@ -25,16 +25,20 @@ built with [Astro](https://astro.build), styled as a retro terminal.
 
 ```text
 src/
-├── data/village.ts          # locale-independent facts (CFP URL, deadline, socials)
+├── data/
+│   ├── village.ts         # locale-independent facts (event, socials)
+│   └── schedule.ts        # confirmed slots: day, room, time, speaker
 ├── i18n/
-│   ├── ui.ts                # every translatable string, keyed per locale
-│   └── utils.ts             # useTranslations(lang), formatDate(iso, lang)
+│   ├── ui.ts              # every translatable string, keyed per locale
+│   └── utils.ts           # useTranslations(lang), formatDay, formatDateSpan
+├── lib/ics.ts             # RFC 5545 builder, America/Argentina/Buenos_Aires
 ├── layouts/
 │   └── VillageLayout.astro  # the page itself; takes a `lang` prop
 ├── og/                      # OG card sources: mascot frame + JetBrains Mono
 └── pages/
     ├── index.astro          # es — served at /
-    └── en/index.astro       # en — served at /en/
+    ├── en/index.astro       # en — served at /en/
+    └── calendar/[lang]/[slug].ics.ts  # prerendered per-talk calendar file
 scripts/og-card.mjs          # `pnpm og` — renders public/assets/og-card.png
 public/assets/               # pixel-art mascot, favicon, generated OG card
 ```
@@ -58,7 +62,20 @@ Locales are declared in `astro.config.mjs` with `prefixDefaultLocale: false`.
 To add a string, add the key to **both** locale objects in `src/i18n/ui.ts` —
 the `satisfies` constraint and the `UIKey` type will flag a locale that is
 missing one. To add a locale, add it to `locales` in `astro.config.mjs`, to
-`languages`/`ui` in `ui.ts`, to `dateFormats` in `utils.ts`, and create
+`languages`/`ui` in `ui.ts`, to the locale branches in `utils.ts`, and create
 `src/pages/<code>/index.astro`.
 
 See [`AGENTS.md`](./AGENTS.md) for the working notes used by coding agents.
+
+## Schedule
+
+Confirmed talks are split the same way as the rest of the site: the slot
+(day, room, clock time, speaker) lives in `src/data/schedule.ts`, and the
+title plus description live in both locales of `src/i18n/ui.ts`
+(`talk.<id>.title`, `talk.<id>.description`).
+
+Día 1–3 are 7, 8 and 9 October 2026 at the CEC, Buenos Aires. Times are
+`America/Argentina/Buenos_Aires` (UTC−3, no DST). Each talk has an "add to
+calendar" link to `/calendar/<lang>/<id>.ics`, emitted by `astro build` —
+those files are not committed.
+
