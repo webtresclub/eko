@@ -187,6 +187,14 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
                 </p>
               )
             }
+            <a
+              class="btn btn--primary schedule-add schedule-add-all"
+              href={`${calendarBase}calendar/${lang}/all.ics`}
+              download="webtres-all.ics"
+            >
+              <span class="prompt" aria-hidden="true">$</span>
+              {t("schedule.addAll")}
+            </a>
             {
               agenda.map((day) => (
                 <div class="day">
@@ -616,6 +624,10 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
   }
   .schedule-add {
     margin-top: 8px;
+  }
+  .schedule-add-all {
+    align-self: flex-start;
+    max-width: 100%;
   }
 
   /* Buttons */

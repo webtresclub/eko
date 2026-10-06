@@ -17,55 +17,60 @@ function isTalkId(value: string | undefined): value is TalkId {
 
 export function getStaticPaths() {
   return (Object.keys(languages) as Lang[]).flatMap((lang) =>
-    talks.map((talk) => ({
-      params: { lang, slug: talk.id },
+    ["all", ...talks.map((talk) => talk.id)].map((slug) => ({
+      params: { lang, slug },
     })),
   );
 }
 
 export const GET: APIRoute = ({ params, site }) => {
-  if (!isLang(params.lang) || !isTalkId(params.slug)) {
+  if (!isLang(params.lang) || (params.slug !== "all" && !isTalkId(params.slug))) {
     return new Response("Not found", { status: 404 });
   }
 
-  const talk = talks.find((item) => item.id === params.slug);
-  const day = talk && days.find((item) => item.n === talk.day);
-  if (!talk || !day || !site) {
+  const selectedTalks = talks.filter((talk) => params.slug === "all" || talk.id === params.slug);
+  const slots = selectedTalks.map((talk) => ({
+    talk,
+    day: days.find((item) => item.n === talk.day),
+  }));
+  if (!site || slots.some(({ day }) => !day)) {
     return new Response("Not found", { status: 404 });
   }
 
   const t = useTranslations(params.lang);
-  const title = t(talkKey(talk.id, "title"));
-  const location = t("schedule.location", { room: talk.room });
   const spoken = t("schedule.icsSpoken");
-  const description = [
-    talk.speaker,
-    location,
-    "",
-    t(talkKey(talk.id, "description")),
-    "",
-    `WebtrES Village · Ekoparty ${event.year}`,
-    ...(spoken ? ["", spoken] : []),
-  ].join("\n");
+  const body = buildIcs(slots.map(({ talk, day }) => {
+    const title = t(talkKey(talk.id, "title"));
+    const location = t("schedule.location", { room: talk.room });
+    const description = [
+      talk.speaker,
+      location,
+      "",
+      t(talkKey(talk.id, "description")),
+      "",
+      `WebtrES Village · Ekoparty ${event.year}`,
+      ...(spoken ? ["", spoken] : []),
+    ].join("\n");
 
-  const page = new URL(params.lang === "en" ? "/en/" : "/", site);
-  page.hash = talk.id;
+    const page = new URL(params.lang === "en" ? "/en/" : "/", site);
+    page.hash = talk.id;
 
-  const body = buildIcs({
-    id: talk.id,
-    title: `${title} — ${talk.speaker}`,
-    description,
-    location,
-    date: day.date,
-    start: talk.start,
-    end: talk.end,
-    url: page.href,
-  });
+    return {
+      id: talk.id,
+      title: `${title} — ${talk.speaker}`,
+      description,
+      location,
+      date: day!.date,
+      start: talk.start,
+      end: talk.end,
+      url: page.href,
+    };
+  }));
 
   return new Response(body, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": `attachment; filename="webtres-${talk.id}.ics"`,
+      "Content-Disposition": `attachment; filename="webtres-${params.slug}.ics"`,
     },
   });
 };

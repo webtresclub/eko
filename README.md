@@ -38,7 +38,7 @@ src/
 └── pages/
     ├── index.astro          # es — served at /
     ├── en/index.astro       # en — served at /en/
-    └── calendar/[lang]/[slug].ics.ts  # prerendered per-talk calendar file
+    └── calendar/[lang]/[slug].ics.ts  # prerendered per-talk and full-agenda calendars
 scripts/og-card.mjs          # `pnpm og` — renders public/assets/og-card.png
 public/assets/               # pixel-art mascot, favicon, generated OG card
 ```
@@ -78,4 +78,10 @@ Día 1–3 are 7, 8 and 9 October 2026 at the CEC, Buenos Aires. Times are
 `America/Argentina/Buenos_Aires` (UTC−3, no DST). Each talk has an "add to
 calendar" link to `/calendar/<lang>/<id>.ics`, emitted by `astro build` —
 those files are not committed.
+
+The "add all talks to calendar" button above the agenda downloads
+`/calendar/<lang>/all.ics`: one calendar containing every confirmed talk,
+localized to the page language. It shares event IDs with the individual
+downloads. Open the file in a calendar app to import the talks; the app may
+ask for confirmation. No account or client-side JavaScript is required.
 

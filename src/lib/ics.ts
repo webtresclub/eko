@@ -64,7 +64,7 @@ function localStamp(date: string, hm: string): string {
   return `${date.replaceAll("-", "")}T${hour}${minute}00`;
 }
 
-export function buildIcs(event: CalendarEvent): string {
+export function buildIcs(events: readonly CalendarEvent[]): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -81,17 +81,19 @@ export function buildIcs(event: CalendarEvent): string {
     "TZNAME:ART",
     "END:STANDARD",
     "END:VTIMEZONE",
-    "BEGIN:VEVENT",
-    `UID:${event.id}@${DOMAIN}`,
-    `DTSTAMP:${DTSTAMP}`,
-    `DTSTART;TZID=${TZID}:${localStamp(event.date, event.start)}`,
-    `DTEND;TZID=${TZID}:${localStamp(event.date, event.end)}`,
-    `SUMMARY:${escapeText(event.title)}`,
-    `DESCRIPTION:${escapeText(event.description)}`,
-    `LOCATION:${escapeText(event.location)}`,
-    `URL:${event.url}`,
-    "STATUS:CONFIRMED",
-    "END:VEVENT",
+    ...events.flatMap((event) => [
+      "BEGIN:VEVENT",
+      `UID:${event.id}@${DOMAIN}`,
+      `DTSTAMP:${DTSTAMP}`,
+      `DTSTART;TZID=${TZID}:${localStamp(event.date, event.start)}`,
+      `DTEND;TZID=${TZID}:${localStamp(event.date, event.end)}`,
+      `SUMMARY:${escapeText(event.title)}`,
+      `DESCRIPTION:${escapeText(event.description)}`,
+      `LOCATION:${escapeText(event.location)}`,
+      `URL:${event.url}`,
+      "STATUS:CONFIRMED",
+      "END:VEVENT",
+    ]),
     "END:VCALENDAR",
   ];
   return `${lines.map(foldLine).join("\r\n")}\r\n`;
