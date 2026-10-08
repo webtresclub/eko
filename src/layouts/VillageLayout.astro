@@ -1,7 +1,7 @@
 ---
 // WebtrES Village — Ekoparty · Buenos Aires · 2026
 import { getRelativeLocaleUrl } from "astro:i18n";
-import { days, talks, venue } from "../data/schedule";
+import { activities, days, talks, triviaTimes, venue } from "../data/schedule";
 import { attribution, event, socials } from "../data/village";
 import { languages, type Lang } from "../i18n/ui";
 import { formatDateSpan, formatDay, talkKey, useTranslations } from "../i18n/utils";
@@ -13,6 +13,7 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
+const renderedAt = Date.now();
 const when = formatDateSpan(days[0].date, days[days.length - 1].date, lang);
 const agenda = days.map((day) => ({
   n: day.n,
@@ -20,6 +21,11 @@ const agenda = days.map((day) => ({
   label: formatDay(day.date, lang),
   talks: talks.filter((talk) => talk.day === day.n),
 }));
+const triviaSlots = days.flatMap((day) => triviaTimes.map((time) => ({
+  startsAt: Date.parse(`${day.date}T${time}:00-03:00`),
+  label: t("activity.trivia.next", { when: `${formatDay(day.date, lang)} · ${time}` }),
+})));
+const nextTrivia = triviaSlots.find((slot) => slot.startsAt > renderedAt);
 const calendarBase = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -168,8 +174,33 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
 
           <div class="console schedule" role="region" aria-label={t("schedule.aria")}>
             <p class="line">
-              <span class="prompt">$</span> ./agenda <span class="flag">--confirmed</span>
+              <span class="prompt">$</span> ./agenda
             </p>
+            <div class="schedule-tabs" role="tablist" aria-label={t("schedule.tabsAria")} hidden>
+              <button
+                class="btn schedule-tab"
+                type="button"
+                id="tab-talks"
+                role="tab"
+                aria-controls="panel-talks"
+                aria-selected="true"
+              >
+                {t("schedule.talks")}
+              </button>
+              <button
+                class="btn schedule-tab"
+                type="button"
+                id="tab-activities"
+                role="tab"
+                aria-controls="panel-activities"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                {t("schedule.activities")}
+              </button>
+            </div>
+            <section class="schedule-panel" id="panel-talks" aria-labelledby="tab-talks">
+            <h2 class="panel-title">{t("schedule.talks")}</h2>
             <p class="line status">
               <span class="bracket">[</span>
               <span class="status-text">{t("schedule.status")}</span>
@@ -205,8 +236,10 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
                   </p>
                   {day.talks.map((talk) => {
                     const title = t(talkKey(talk.id, "title"));
+                    const completed = Date.parse(`${day.date}T${talk.end}:00-03:00`) <= renderedAt;
+                    const live = Date.parse(`${day.date}T${talk.start}:00-03:00`) <= renderedAt && !completed;
                     return (
-                      <article class="talk" id={talk.id}>
+                      <article class:list={["talk", { "talk--completed": completed, "talk--live": live }]} id={talk.id}>
                         <p class="talk-meta">
                           <time datetime={`${day.date}T${talk.start}:00-03:00`}>{talk.start}</time>
                           {" – "}
@@ -215,6 +248,11 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
                           <span>{t("schedule.room", { room: talk.room })}</span>
                           <span class="talk-dot" aria-hidden="true">·</span>
                           <span>{t("schedule.kind")}</span>
+                          <span class="talk-live" hidden={!live}>{t("schedule.live")}</span>
+                          <span class="talk-completed" hidden={!completed}>
+                            <span class="talk-dot" aria-hidden="true">·</span>
+                            {t("schedule.completed")}
+                          </span>
                         </p>
                         <h2 class="talk-title">{title}</h2>
                         <p class="talk-speaker">{talk.speaker}</p>
@@ -234,6 +272,37 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
                 </div>
               ))
             }
+            </section>
+            <section class="schedule-panel" id="panel-activities" aria-labelledby="tab-activities">
+              <h2 class="panel-title">{t("schedule.activities")}</h2>
+              <div class="activities">
+                {activities.map((id) => (
+                  <article class="activity" id={id}>
+                    <div class="activity-heading">
+                      <h3 class="talk-title">{t(`activity.${id}.title`)}</h3>
+                      {id !== "trivia" && (
+                        <span class="talk-live activity-live">{t("schedule.live")}</span>
+                      )}
+                    </div>
+                    <p class="talk-desc">{t(`activity.${id}.description`)}</p>
+                    {id === "trivia" && (
+                      <>
+                        <p class="activity-schedule">
+                          {t("activity.trivia.schedule", { start: triviaTimes[0], end: triviaTimes[triviaTimes.length - 1] })}
+                        </p>
+                        <p
+                          class="activity-schedule trivia-next"
+                          data-slots={JSON.stringify(triviaSlots)}
+                          data-no-upcoming={t("activity.trivia.noUpcoming")}
+                        >
+                          {nextTrivia?.label ?? t("activity.trivia.noUpcoming")}
+                        </p>
+                      </>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
           </div>
 
         </div>
@@ -254,6 +323,87 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
     </main>
   </body>
 </html>
+
+<script>
+  const schedule = document.querySelector<HTMLElement>(".schedule");
+  if (schedule) {
+    const talkElements = Array.from(schedule.querySelectorAll<HTMLElement>(".talk")).map((element) => ({
+      element,
+      startsAt: Date.parse(element.querySelector<HTMLTimeElement>("time:first-of-type")!.dateTime),
+      endsAt: Date.parse(element.querySelector<HTMLTimeElement>("time:last-of-type")!.dateTime),
+      completedLabel: element.querySelector<HTMLElement>(".talk-completed")!,
+      liveLabel: element.querySelector<HTMLElement>(".talk-live")!,
+    }));
+    const triviaElement = schedule.querySelector<HTMLElement>(".trivia-next")!;
+    const triviaSlots = JSON.parse(triviaElement.dataset.slots!) as { startsAt: number; label: string }[];
+    let stateTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function updateScheduleStates() {
+      clearTimeout(stateTimer);
+      const now = Date.now();
+      let nextChange = Infinity;
+      for (const talk of talkElements) {
+        const completed = talk.endsAt <= now;
+        const live = talk.startsAt <= now && !completed;
+        talk.element.classList.toggle("talk--completed", completed);
+        talk.element.classList.toggle("talk--live", live);
+        talk.completedLabel.hidden = !completed;
+        talk.liveLabel.hidden = !live;
+        if (talk.startsAt > now) nextChange = Math.min(nextChange, talk.startsAt);
+        else if (!completed) nextChange = Math.min(nextChange, talk.endsAt);
+      }
+      const nextTrivia = triviaSlots.find((slot) => slot.startsAt > now);
+      triviaElement.textContent = nextTrivia?.label ?? triviaElement.dataset.noUpcoming!;
+      if (nextTrivia) nextChange = Math.min(nextChange, nextTrivia.startsAt);
+      if (nextChange !== Infinity) {
+        stateTimer = setTimeout(updateScheduleStates, Math.min(nextChange - now, 2_147_483_647));
+      }
+    }
+
+    updateScheduleStates();
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) updateScheduleStates();
+    });
+
+    const tablist = schedule.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tabs = Array.from(tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = tabs.map((tab) => document.getElementById(tab.getAttribute("aria-controls")!)!);
+
+    function selectTab(index: number) {
+      tabs.forEach((tab, i) => {
+        const selected = i === index;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        panels[i].hidden = !selected;
+      });
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => selectTab(index));
+      tab.addEventListener("keydown", (event) => {
+        let next: number;
+        switch (event.key) {
+          case "ArrowRight": next = (index + 1) % tabs.length; break;
+          case "ArrowLeft": next = (index + tabs.length - 1) % tabs.length; break;
+          case "Home": next = 0; break;
+          case "End": next = tabs.length - 1; break;
+          default: return;
+        }
+        event.preventDefault();
+        selectTab(next);
+        tabs[next].focus();
+      });
+    });
+
+    panels.forEach((panel) => {
+      panel.setAttribute("role", "tabpanel");
+      panel.tabIndex = 0;
+    });
+    selectTab(0);
+    schedule.dataset.tabsReady = "";
+    tablist.hidden = false;
+  }
+</script>
 
 <style is:global>
   :root {
@@ -515,10 +665,6 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
     margin-right: 6px;
   }
 
-  .flag {
-    color: #e5c07b;
-  }
-
   .status {
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -554,6 +700,77 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
   }
   .schedule .line + .line {
     margin-top: 0;
+  }
+  .schedule-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 12px;
+    border-bottom: 1px solid rgba(148, 209, 173, 0.15);
+  }
+  .schedule-tab {
+    min-height: 44px;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+  .schedule-tab:hover {
+    background: var(--secondary);
+    color: var(--accent);
+  }
+  .schedule-tab[aria-selected="true"] {
+    background: var(--secondary);
+    color: var(--accent);
+    border-bottom-color: var(--primary);
+  }
+  .schedule-tab:active {
+    color: var(--primary);
+  }
+  .schedule-tabs[hidden],
+  .schedule-panel[hidden],
+  .schedule[data-tabs-ready] .panel-title {
+    display: none;
+  }
+  .schedule-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .schedule-panel:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+  }
+  .panel-title {
+    font-size: 16px;
+  }
+  .activities {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+  }
+  .activity {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 0;
+    border-top: 1px solid rgba(148, 209, 173, 0.15);
+  }
+  .activity-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .activity .activity-live {
+    margin-left: 0;
+  }
+  .activity-schedule {
+    margin: 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--primary);
+    opacity: 0.75;
   }
   .day {
     display: flex;
@@ -608,6 +825,36 @@ const ogImageUrl = new URL("/assets/og-card.png", Astro.site);
     font-weight: 700;
     line-height: 22px;
     color: var(--primary);
+  }
+  .talk--completed .talk-title {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    opacity: 0.65;
+  }
+  .talk--completed .talk-speaker,
+  .talk--completed .talk-desc {
+    opacity: 0.6;
+  }
+  .talk-completed {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .talk--live .talk-title {
+    color: var(--accent);
+  }
+  .talk-live {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 6px;
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-md);
+    background: var(--secondary);
+    color: var(--accent);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .talk-live[hidden] {
+    display: none;
   }
   .talk-speaker {
     margin: 0;

@@ -36,7 +36,7 @@ committed** — `pnpm build` does not produce it.
   JetBrains Mono files in `src/og/`. System fonts are disabled, so output is byte-identical
   on any machine.
 - After editing the card, re-run `pnpm og` and commit the PNG, or it goes stale.
-- The card is deliberately locale-neutral; one image serves both locales. Only
+- The card uses Spanish wording (`EN VIVO`); one image serves both locales. Only
   `og:image:alt` differs per locale (`meta.ogImageAlt` in `ui.ts`).
 - The year appears in **both** `src/data/village.ts` and `scripts/og-card.mjs`. Rolling to a
   new edition means editing both and re-running `pnpm og`.

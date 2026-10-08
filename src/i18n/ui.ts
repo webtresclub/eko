@@ -15,7 +15,7 @@ export const ui = {
     "meta.ogDescription":
       "Agenda confirmada de WebtrES Village en Ekoparty {year}. Charlas de la comunidad de blockchain hackers.",
     "meta.ogImageAlt":
-      "Terminal retro con el UwUloscopio: WebtrES Village — COMING SOON — Ekoparty · Buenos Aires · {year}",
+      "Terminal retro con el UwUloscopio: WebtrES Village — EN VIVO — Ekoparty · Buenos Aires · {year}",
 
     "terminal.aria": "WebtrES Village, agenda confirmada",
     "lang.aria": "Seleccionar idioma",
@@ -26,16 +26,35 @@ export const ui = {
 
     "schedule.status": "CONFIRMADA",
     "schedule.note": "charlas del village · {when} · {venue}",
-    "schedule.aria": "Agenda confirmada",
+    "schedule.aria": "Agenda del village",
     "schedule.day": "día {n}",
     "schedule.room": "sala {room}",
     "schedule.kind": "charla",
+    "schedule.completed": "Finalizada",
+    "schedule.live": "En Vivo",
     "schedule.add": "agregar al calendario",
     "schedule.addAria": "Agregar «{title}» al calendario",
     "schedule.addAll": "agregar todas las charlas al calendario",
     "schedule.location": "Sala {room}, CEC, Buenos Aires",
     "schedule.langNote": "",
     "schedule.icsSpoken": "",
+    "schedule.tabsAria": "Tipo de evento",
+    "schedule.talks": "Charlas",
+    "schedule.activities": "Actividades",
+
+    "activity.sealstrology.title": "Sealstrology",
+    "activity.sealstrology.description": "Vení a completar la constelación.",
+    "activity.opsek.title": "Opsek",
+    "activity.opsek.description": "Probá tu conocimiento sobre opsec y ganate una 🧢.",
+    "activity.ctf.title": "CTF",
+    "activity.ctf.description": "Resolvé tu primer CTF blockchain y ganate una 👕 con un pack de stickers.",
+    "activity.trivia.title": "Trivia",
+    "activity.trivia.description": "Probá tu conocimiento sobre blockchain y ganate una 👕.",
+    "activity.trivia.schedule": "Cada hora · {start}–{end}",
+    "activity.trivia.next": "Próxima: {when}",
+    "activity.trivia.noUpcoming": "Sin próximas trivias programadas",
+    "activity.phishing-dojo.title": "Phishing Dojo",
+    "activity.phishing-dojo.description": "Vení a aprender sobre phishing.",
 
     "talk.defi-hack.title": "Como hackearía un protocolo DeFi",
     "talk.defi-hack.description":
@@ -68,7 +87,7 @@ export const ui = {
     "meta.ogDescription":
       "Confirmed WebtrES Village schedule at Ekoparty {year}. Talks from the blockchain hackers community.",
     "meta.ogImageAlt":
-      "Retro terminal with the UwUloscopio mascot: WebtrES Village — COMING SOON — Ekoparty · Buenos Aires · {year}",
+      "Retro terminal with the UwUloscopio mascot: WebtrES Village — EN VIVO (live) — Ekoparty · Buenos Aires · {year}",
 
     "terminal.aria": "WebtrES Village, confirmed schedule",
     "lang.aria": "Select language",
@@ -79,16 +98,35 @@ export const ui = {
 
     "schedule.status": "CONFIRMED",
     "schedule.note": "village talks · {when} · {venue}",
-    "schedule.aria": "Confirmed schedule",
+    "schedule.aria": "Village schedule",
     "schedule.day": "day {n}",
     "schedule.room": "room {room}",
     "schedule.kind": "talk",
+    "schedule.completed": "Completed",
+    "schedule.live": "Live",
     "schedule.add": "add to calendar",
     "schedule.addAria": "Add “{title}” to calendar",
     "schedule.addAll": "add all talks to calendar",
     "schedule.location": "Room {room}, CEC, Buenos Aires",
     "schedule.langNote": "talks are in spanish",
     "schedule.icsSpoken": "Talk in Spanish.",
+    "schedule.tabsAria": "Event type",
+    "schedule.talks": "Talks",
+    "schedule.activities": "Activities",
+
+    "activity.sealstrology.title": "Sealstrology",
+    "activity.sealstrology.description": "Come complete the constellation.",
+    "activity.opsek.title": "Opsek",
+    "activity.opsek.description": "Test your opsec knowledge and win a 🧢.",
+    "activity.ctf.title": "CTF",
+    "activity.ctf.description": "Solve your first blockchain CTF and win a 👕 with a sticker pack.",
+    "activity.trivia.title": "Trivia",
+    "activity.trivia.description": "Test your blockchain knowledge and win a 👕.",
+    "activity.trivia.schedule": "Every hour · {start}–{end}",
+    "activity.trivia.next": "Next: {when}",
+    "activity.trivia.noUpcoming": "No upcoming trivia sessions",
+    "activity.phishing-dojo.title": "Phishing Dojo",
+    "activity.phishing-dojo.description": "Come learn about phishing.",
 
     "talk.defi-hack.title": "How I would hack a DeFi protocol",
     "talk.defi-hack.description":

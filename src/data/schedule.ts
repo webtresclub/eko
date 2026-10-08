@@ -65,4 +65,9 @@ export const talks = [
   },
 ] as const;
 
+// Village activities; Trivia runs hourly on each conference day.
+export const activities = ["ctf", "trivia", "opsek", "sealstrology", "phishing-dojo"] as const;
+
+export const triviaTimes = ["13:30", "14:30", "15:30", "16:30", "17:30"] as const;
+
 export type TalkId = (typeof talks)[number]["id"];

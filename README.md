@@ -50,6 +50,9 @@ deploy build does not render it, so no fonts or renderer are needed on the build
 Re-run `pnpm og` after editing `scripts/og-card.mjs`. See [`AGENTS.md`](./AGENTS.md) for
 details.
 
+The shared card uses the Spanish status **EN VIVO** for Ekoparty 2026. Both locales'
+`meta.ogImageAlt` descriptions reflect that wording.
+
 `site` in `astro.config.mjs` must point at the live origin: `og:image`, `og:url`,
 `canonical`, and `hreflang` are all derived from it, and social scrapers reject relative
 URLs.
@@ -69,10 +72,36 @@ See [`AGENTS.md`](./AGENTS.md) for the working notes used by coding agents.
 
 ## Schedule
 
+The agenda has **Charlas / Actividades** tabs (**Talks / Activities** in English).
+Charlas is selected by default; arrow keys, Home, and End navigate the tabs.
+Without JavaScript, both sections remain visible.
+
+Activities are listed in the `activities` array in `src/data/schedule.ts`, with
+names and descriptions in `activity.<id>.title` / `activity.<id>.description`
+in both locales of `src/i18n/ui.ts`. CTF, Opsek, Sealstrology, and Phishing Dojo
+are explicitly labeled “En Vivo” / “Live”; no ending times are inferred.
+
+Trivia runs at 13:30, 14:30, 15:30, 16:30, and 17:30 on each conference day
+(7–9 October, Buenos Aires time), defined by `triviaTimes` in `schedule.ts`.
+Its card shows the next strictly future session and updates without a reload.
+At a session's starting time it advances to the next one; after the day's last
+start it shows the next conference day, if any. After the final scheduled start,
+it says there are no upcoming sessions, without assuming a session duration.
+Activities have no calendar downloads.
+
 Confirmed talks are split the same way as the rest of the site: the slot
 (day, room, clock time, speaker) lives in `src/data/schedule.ts`, and the
 title plus description live in both locales of `src/i18n/ui.ts`
 (`talk.<id>.title`, `talk.<id>.description`).
+
+Talks show a localized “En Vivo” / “Live” badge from their scheduled start
+(inclusive) until their end (exclusive), using `America/Argentina/Buenos_Aires`
+(UTC−3). At the ending time they are marked complete with struck-through titles,
+muted details, and a “Finalizada” / “Completed” label. The browser checks on load,
+schedules the next starting or ending time, and refreshes when the tab becomes
+visible; no rebuild or page reload is required. This relies on the visitor's
+device clock. Without JavaScript, status reflects the time of the last build.
+Calendar downloads are retained as part of the talk schedule history.
 
 Día 1–3 are 7, 8 and 9 October 2026 at the CEC, Buenos Aires. Times are
 `America/Argentina/Buenos_Aires` (UTC−3, no DST). Each talk has an "add to

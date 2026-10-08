@@ -24,12 +24,12 @@ const ACCENT = "#ffffff";
 const ERROR = "#ff6b6b";
 const YELLOW = "#e5c07b";
 
-// Card copy. Deliberately locale-neutral: one card serves both /es and /en. The year is
+// Card copy. One Spanish card serves both locales. The year is
 // duplicated from src/data/village.ts — see docs/superpowers/specs/2026-07-28-og-card-design.md.
 const YEAR = "2026";
 const TERM_TITLE = "webtres@ekoparty:~";
 const PROMPT_LINE = "$ ./village --status";
-const STATUS = "COMING SOON";
+const STATUS = "EN VIVO";
 const EVENT_LINE = `Ekoparty · Buenos Aires · ${YEAR}`;
 
 // Pixel art, drawn at an integer 1.5x with nearest-neighbour sampling. Smooth
